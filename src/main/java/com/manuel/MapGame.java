@@ -2,9 +2,8 @@ package com.manuel;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Arrays;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JPanel;
 
@@ -16,12 +15,7 @@ public class MapGame extends JPanel {
         setBackground(Color.gray);
         setLocation(0, 0);
         setSize(500, 500);
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                moveUp();
-            }
-        });
+        addKeyListener(new GameController());
     }
 
     public void randomSpawn() {
@@ -43,14 +37,12 @@ public class MapGame extends JPanel {
     }
 
     public void moveUp() {
-        Box[][] updateBoxs = new Box[4][4];
-
         for (int mainRow = 0; mainRow < actualBoxs.length; mainRow++) {
-            if (numberEmptyRow(mainRow) > 0) {
-                for (int mainCol = 0; mainCol < updateBoxs[mainRow].length; mainCol++) {
+            if (emptyBoxRowCount(mainRow) > 0) {
+                for (int mainCol = 0; mainCol < actualBoxs[mainRow].length; mainCol++) {
                     if (actualBoxs[mainRow][mainCol] == null) {
-                        if (numberEmptyCol(mainCol, mainRow + 1) < 3) {
-                            for (int i = mainRow + 1; i < updateBoxs.length; i++) {
+                        if (emptyBoxColCount(mainCol, mainRow + 1) < 3) {
+                            for (int i = mainRow + 1; i < actualBoxs.length; i++) {
                                 if (actualBoxs[i][mainCol] != null) {
                                     moveBox(i, mainCol, mainRow, mainCol);
                                     break;
@@ -62,7 +54,112 @@ public class MapGame extends JPanel {
             }
         }
 
-        updateMap();
+        gameLogic(Direction.ARRIBA);
+        randomSpawn();
+    }
+
+    public void moveDown() {
+        for (int mainRow = actualBoxs.length - 1; mainRow >= 0; mainRow--) {
+            if (emptyBoxRowCount(mainRow) > 0) {
+                for (int mainCol = actualBoxs[mainRow].length - 1; mainCol >= 0; mainCol--) {
+                    if (actualBoxs[mainRow][mainCol] == null) {
+                        if (emptyBoxColCount(mainCol, 0, mainRow) < 3) {
+                            for (int i = mainRow - 1; i >= 0; i--) {
+                                if (actualBoxs[i][mainCol] != null) {
+                                    moveBox(i, mainCol, mainRow, mainCol);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        randomSpawn();
+    }
+
+    public void moveLeft() {
+        for (int mainCol = 0; mainCol < actualBoxs.length; mainCol++) {
+            if (emptyBoxColCount(mainCol) > 0) {
+                for (int mainRow = 0; mainRow < actualBoxs[mainCol].length; mainRow++) {
+                    if (actualBoxs[mainRow][mainCol] == null) {
+                        if (emptyBoxRowCount(mainRow, mainCol + 1) < 3) {
+                            for (int i = mainCol + 1; i < actualBoxs.length; i++) {
+                                if (actualBoxs[mainRow][i] != null) {
+                                    moveBox(mainRow, i, mainRow, mainCol);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        randomSpawn();
+    }
+
+    public void moveRight() {
+        for (int mainCol = actualBoxs.length - 1; mainCol >= 0; mainCol--) {
+            if (emptyBoxColCount(mainCol) > 0) {
+                for (int mainRow = actualBoxs[mainCol].length - 1; mainRow >= 0; mainRow--) {
+                    if (actualBoxs[mainRow][mainCol] == null) {
+                        if (emptyBoxRowCount(mainRow, 0, mainCol) < 3) {
+                            for (int i = mainCol - 1; i >= 0; i--) {
+                                if (actualBoxs[mainRow][i] != null) {
+                                    moveBox(mainRow, i, mainRow, mainCol);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        randomSpawn();
+    }
+
+    private void gameLogic(Direction direction) {
+        switch (direction) {
+            case ARRIBA:
+                for (int i = 0; i < actualBoxs.length - 1; i++) {
+                    for (int j = 0; j < actualBoxs[i].length; j++) {
+                        if (actualBoxs[i][j] != null) {
+                            if (actualBoxs[i + 1][j] != null) {
+                                if (actualBoxs[i][j].equals(actualBoxs[i + 1][j])) {
+                                    actualBoxs[i][j].updateBox();
+                                    ;
+                                    actualBoxs[i + 1][j].setVisible(false);
+                                    ;
+                                    actualBoxs[i + 1][j] = null;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case ABAJO:
+                for (int i = 0; i < actualBoxs.length - 1; i++) {
+                    for (int j = 0; j < actualBoxs[i].length; j++) {
+                        if (actualBoxs[i][j] != null) {
+                            if (actualBoxs[i + 1][j] != null) {
+                                if (actualBoxs[i][j].equals(actualBoxs[i + 1][j])) {
+                                    actualBoxs[i][j].updateBox();
+                                    ;
+                                    actualBoxs[i + 1][j].setVisible(false);
+                                    ;
+                                    actualBoxs[i + 1][j] = null;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+        }
+
+        repaint();
     }
 
     public void moveBox(int oldRow, int oldCol, int newRow, int newCol) {
@@ -75,21 +172,25 @@ public class MapGame extends JPanel {
                 }
             }
         }
-        
+
         newMap[newRow][newCol] = actualBoxs[oldRow][oldCol];
         newMap[newRow][newCol].setLocation(spawnPoints[newRow][newCol]);
 
         actualBoxs = newMap;
     }
 
-    public int numberEmptyRow(int row) {
-        return numberEmptyRow(row, 0);
+    public int emptyBoxRowCount(int row) {
+        return emptyBoxRowCount(row, 0, actualBoxs.length);
     }
 
-    public int numberEmptyRow(int row, int position) {
+    public int emptyBoxRowCount(int row, int position) {
+        return emptyBoxRowCount(row, position, actualBoxs.length);
+    }
+
+    public int emptyBoxRowCount(int row, int position, int limit) {
         int contador = 0;
-        
-        for (int i = position; i < actualBoxs[row].length; i++) {
+
+        for (int i = position; i < limit; i++) {
             if (actualBoxs[row][i] == null) {
                 contador++;
             }
@@ -98,35 +199,24 @@ public class MapGame extends JPanel {
         return contador;
     }
 
-    public int numberEmptyCol(int col) {
-        return numberEmptyCol(col, 0);
+    public int emptyBoxColCount(int col) {
+        return emptyBoxColCount(col, 0, actualBoxs.length);
     }
 
-    public int numberEmptyCol(int col, int position) {
+    public int emptyBoxColCount(int col, int position) {
+        return emptyBoxColCount(col, position, actualBoxs.length);
+    }
+
+    public int emptyBoxColCount(int col, int position, int limit) {
         int contador = 0;
 
-        for (int i = position; i < actualBoxs.length; i++) {
+        for (int i = position; i < limit; i++) {
             if (actualBoxs[i][col] == null) {
                 contador++;
             }
         }
 
         return contador;
-    }
-
-    private void updateMap() {
-        System.out.println(getComponentCount());
-        removeAll();
-        System.out.println(getComponentCount());
-        for (int i = 0; i < actualBoxs.length; i++) {
-            for (int j = 0; j < actualBoxs[i].length; j++) {
-                if (actualBoxs[i][j] != null) {
-                    add(actualBoxs[i][j]);
-                }
-            }
-        }
-        System.out.println(getComponentCount());
-        System.out.println(Arrays.deepToString(actualBoxs));
     }
 
     private void setSpawnPoints() {
@@ -149,7 +239,7 @@ public class MapGame extends JPanel {
     private void initialSpawn() {
         int randomPositionRow;
         int randomPositionCol;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 2; i++) {
             randomPositionRow = (int) (Math.random() * 4);
             randomPositionCol = (int) (Math.random() * 4);
             actualBoxs[randomPositionRow][randomPositionCol] = new Box(
@@ -162,6 +252,35 @@ public class MapGame extends JPanel {
         actualBoxs = new Box[4][4];
     }
 
+    private class GameController extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_UP) {
+                moveUp();
+            }
+
+            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                moveDown();
+            }
+
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                moveLeft();
+            }
+
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                moveRight();
+            }
+        }
+    }
+
+    private enum Direction {
+        ARRIBA,
+        ABAJO,
+        DERECHA,
+        IZQUIERDA;
+    }
+
     Point[][] spawnPoints;
     Box[][] actualBoxs;
+    GameController gameController = new GameController();
 }

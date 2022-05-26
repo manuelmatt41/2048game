@@ -11,9 +11,10 @@ import javax.swing.SwingConstants;
 public class Box extends JLabel {
     public Box(Point spawn) {
         super("", SwingConstants.CENTER);
-        setText("" + mainRandomNumbers[0]);
+        exponencial = mainRandomNumbers[0];
         setFont(new Font("arial", Font.BOLD, 20));
         setForeground(Color.white);
+        setText(exponencial + "");
         setSize(125, 125);
         setLocation(spawn);
         setOpaque(true);
@@ -26,5 +27,31 @@ public class Box extends JLabel {
         return getText();
     }
 
-    int[] mainRandomNumbers = { 2, 4 };
+    @Override
+    public void setText(String text) {
+        super.setText((1<<Integer.parseInt(text.equals("") ? "0" : text)) + "");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null) {
+            if (obj.getClass() == Box.class) {
+                Box b = (Box) obj;
+
+                if (b.getText().equals(getText())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public void updateBox() {
+        exponencial++;
+        setText(exponencial + "");
+    }
+
+    int[] mainRandomNumbers = { 1, 2 };
+    int exponencial;
 }

@@ -1,1 +1,1 @@
-Inciando el proyecto, hecho el movimiento para arriba de las cajas
+Movimiento de las cajas por el mapa y logica del juego.
