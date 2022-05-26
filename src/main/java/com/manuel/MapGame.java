@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 import javax.swing.JPanel;
 
@@ -57,10 +58,11 @@ public class MapGame extends JPanel {
         }
 
         gameLogic(Direction.ARRIBA);
+
         if (movimiento) {
             randomSpawn();
-
         }
+        movimientos[0] = movimiento;
     }
 
     public void moveDown() {
@@ -87,6 +89,7 @@ public class MapGame extends JPanel {
         if (movimiento) {
             randomSpawn();
         }
+        movimientos[1] = movimiento;
     }
 
     public void moveLeft() {
@@ -113,6 +116,7 @@ public class MapGame extends JPanel {
         if (movimiento) {
             randomSpawn();
         }
+        movimientos[2] = movimiento;
     }
 
     public void moveRight() {
@@ -139,6 +143,8 @@ public class MapGame extends JPanel {
         if (movimiento) {
             randomSpawn();
         }
+        movimientos[3] = movimiento;
+        ;
     }
 
     private void gameLogic(Direction direction) {
@@ -205,6 +211,7 @@ public class MapGame extends JPanel {
                 break;
         }
         recollector(direction);
+        lost();
         try {
             Thread.sleep(25);
         } catch (InterruptedException e) {
@@ -319,6 +326,13 @@ public class MapGame extends JPanel {
         return contador;
     }
 
+    public void lost() {
+        boolean[] p = { false, false, false, false };
+        if (Arrays.equals(movimientos, p)) {
+            // System.exit(0);
+        }
+    }
+
     private void setSpawnPoints() {
         spawnPoints = new Point[4][4];
 
@@ -376,4 +390,5 @@ public class MapGame extends JPanel {
     Point[][] spawnPoints;
     Box[][] actualBoxs;
     GameController gameController = new GameController();
+    boolean[] movimientos = { true, true, true, true };
 }
