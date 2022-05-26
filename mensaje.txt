@@ -1,1 +1,1 @@
-Movimiento de las cajas por el mapa y logica del juego.
+Hecho toda la logica y reglas del juego, falta añadir puntuacion y tiempo de juego.

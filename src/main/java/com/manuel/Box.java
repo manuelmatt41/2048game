@@ -14,12 +14,10 @@ public class Box extends JLabel {
         exponencial = mainRandomNumbers[0];
         setFont(new Font("arial", Font.BOLD, 20));
         setForeground(Color.white);
-        setText(exponencial + "");
-        setSize(125, 125);
-        setLocation(spawn);
+        updateBox();
+        spawnAnimation(spawn);
         setOpaque(true);
-        setBackground(Color.lightGray);
-        setBorder(BorderFactory.createMatteBorder(12, 12, 12, 12, Color.gray));
+        setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Color.gray));
     }
 
     @Override
@@ -29,7 +27,7 @@ public class Box extends JLabel {
 
     @Override
     public void setText(String text) {
-        super.setText((1<<Integer.parseInt(text.equals("") ? "0" : text)) + "");
+        super.setText((1 << Integer.parseInt(text.equals("") ? "0" : text)) + "");
     }
 
     @Override
@@ -47,11 +45,95 @@ public class Box extends JLabel {
         return false;
     }
 
+    @Override
+    public void setBackground(Color bg) {
+
+        super.setBackground(bg);
+    }
+
     public void updateBox() {
         exponencial++;
         setText(exponencial + "");
+        setBackground(numberColors[exponencial]);
     }
 
-    int[] mainRandomNumbers = { 1, 2 };
+    public void spawnAnimation(Point p) {
+        setLocation(p);
+
+        new Thread(() -> {
+            for (int i = 1; i <= 5; i++) {
+                int multiplo = i * 25;
+                setSize(multiplo, multiplo);
+
+                try {
+                    Thread.sleep(25);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }) {
+        }.start();
+    }
+
+    public void moveAnimation(Point inicial, Point ultimo, Direction direction) {
+        new Thread(() -> {
+            switch (direction) {
+                case ARRIBA:
+                    for (int i = inicial.y; i >= ultimo.y; i -= 5) {
+                        setLocation(ultimo.x, i);
+
+                        try {
+                            Thread.sleep(2);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                case ABAJO:
+                    for (int i = inicial.y; i < ultimo.y; i += 5) {
+                        setLocation(ultimo.x, i);
+
+                        try {
+                            Thread.sleep(2);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                case IZQUIERDA:
+                    for (int i = inicial.x; i >= ultimo.x; i -= 5) {
+                        setLocation(i, ultimo.y);
+
+                        try {
+                            Thread.sleep(2);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                case DERECHA:
+                    for (int i = inicial.x; i < ultimo.x; i += 5) {
+                        setLocation(i, ultimo.y);
+
+                        try {
+                            Thread.sleep(2);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+            }
+        }) {
+        }.start();
+    }
+
+    int[] mainRandomNumbers = { 0, 1 };
+    Color[] numberColors = { Color.white, Color.lightGray, Color.orange, Color.PINK, Color.magenta,Color.red, Color.blue,
+            Color.cyan, Color.green, Color.yellow };
     int exponencial;
 }

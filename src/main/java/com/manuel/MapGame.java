@@ -37,6 +37,7 @@ public class MapGame extends JPanel {
     }
 
     public void moveUp() {
+        boolean movimiento = false;
         for (int mainRow = 0; mainRow < actualBoxs.length; mainRow++) {
             if (emptyBoxRowCount(mainRow) > 0) {
                 for (int mainCol = 0; mainCol < actualBoxs[mainRow].length; mainCol++) {
@@ -44,7 +45,8 @@ public class MapGame extends JPanel {
                         if (emptyBoxColCount(mainCol, mainRow + 1) < 3) {
                             for (int i = mainRow + 1; i < actualBoxs.length; i++) {
                                 if (actualBoxs[i][mainCol] != null) {
-                                    moveBox(i, mainCol, mainRow, mainCol);
+                                    moveBox(i, mainCol, mainRow, mainCol, Direction.ARRIBA);
+                                    movimiento = true;
                                     break;
                                 }
                             }
@@ -55,10 +57,14 @@ public class MapGame extends JPanel {
         }
 
         gameLogic(Direction.ARRIBA);
-        randomSpawn();
+        if (movimiento) {
+            randomSpawn();
+
+        }
     }
 
     public void moveDown() {
+        boolean movimiento = false;
         for (int mainRow = actualBoxs.length - 1; mainRow >= 0; mainRow--) {
             if (emptyBoxRowCount(mainRow) > 0) {
                 for (int mainCol = actualBoxs[mainRow].length - 1; mainCol >= 0; mainCol--) {
@@ -66,7 +72,8 @@ public class MapGame extends JPanel {
                         if (emptyBoxColCount(mainCol, 0, mainRow) < 3) {
                             for (int i = mainRow - 1; i >= 0; i--) {
                                 if (actualBoxs[i][mainCol] != null) {
-                                    moveBox(i, mainCol, mainRow, mainCol);
+                                    moveBox(i, mainCol, mainRow, mainCol, Direction.ABAJO);
+                                    movimiento = true;
                                     break;
                                 }
                             }
@@ -76,10 +83,14 @@ public class MapGame extends JPanel {
             }
         }
 
-        randomSpawn();
+        gameLogic(Direction.ABAJO);
+        if (movimiento) {
+            randomSpawn();
+        }
     }
 
     public void moveLeft() {
+        boolean movimiento = false;
         for (int mainCol = 0; mainCol < actualBoxs.length; mainCol++) {
             if (emptyBoxColCount(mainCol) > 0) {
                 for (int mainRow = 0; mainRow < actualBoxs[mainCol].length; mainRow++) {
@@ -87,7 +98,8 @@ public class MapGame extends JPanel {
                         if (emptyBoxRowCount(mainRow, mainCol + 1) < 3) {
                             for (int i = mainCol + 1; i < actualBoxs.length; i++) {
                                 if (actualBoxs[mainRow][i] != null) {
-                                    moveBox(mainRow, i, mainRow, mainCol);
+                                    moveBox(mainRow, i, mainRow, mainCol, Direction.IZQUIERDA);
+                                    movimiento = true;
                                     break;
                                 }
                             }
@@ -97,10 +109,14 @@ public class MapGame extends JPanel {
             }
         }
 
-        randomSpawn();
+        gameLogic(Direction.IZQUIERDA);
+        if (movimiento) {
+            randomSpawn();
+        }
     }
 
     public void moveRight() {
+        boolean movimiento = false;
         for (int mainCol = actualBoxs.length - 1; mainCol >= 0; mainCol--) {
             if (emptyBoxColCount(mainCol) > 0) {
                 for (int mainRow = actualBoxs[mainCol].length - 1; mainRow >= 0; mainRow--) {
@@ -108,7 +124,8 @@ public class MapGame extends JPanel {
                         if (emptyBoxRowCount(mainRow, 0, mainCol) < 3) {
                             for (int i = mainCol - 1; i >= 0; i--) {
                                 if (actualBoxs[mainRow][i] != null) {
-                                    moveBox(mainRow, i, mainRow, mainCol);
+                                    moveBox(mainRow, i, mainRow, mainCol, Direction.DERECHA);
+                                    movimiento = true;
                                     break;
                                 }
                             }
@@ -118,7 +135,10 @@ public class MapGame extends JPanel {
             }
         }
 
-        randomSpawn();
+        gameLogic(Direction.DERECHA);
+        if (movimiento) {
+            randomSpawn();
+        }
     }
 
     private void gameLogic(Direction direction) {
@@ -130,9 +150,7 @@ public class MapGame extends JPanel {
                             if (actualBoxs[i + 1][j] != null) {
                                 if (actualBoxs[i][j].equals(actualBoxs[i + 1][j])) {
                                     actualBoxs[i][j].updateBox();
-                                    ;
                                     actualBoxs[i + 1][j].setVisible(false);
-                                    ;
                                     actualBoxs[i + 1][j] = null;
                                 }
                             }
@@ -141,16 +159,44 @@ public class MapGame extends JPanel {
                 }
                 break;
             case ABAJO:
+                for (int i = actualBoxs.length - 1; i > 0; i--) {
+                    for (int j = actualBoxs[i].length - 1; j >= 0; j--) {
+                        if (actualBoxs[i][j] != null) {
+                            if (actualBoxs[i - 1][j] != null) {
+                                if (actualBoxs[i][j].equals(actualBoxs[i - 1][j])) {
+                                    actualBoxs[i][j].updateBox();
+                                    actualBoxs[i - 1][j].setVisible(false);
+                                    actualBoxs[i - 1][j] = null;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case IZQUIERDA:
                 for (int i = 0; i < actualBoxs.length - 1; i++) {
                     for (int j = 0; j < actualBoxs[i].length; j++) {
-                        if (actualBoxs[i][j] != null) {
-                            if (actualBoxs[i + 1][j] != null) {
-                                if (actualBoxs[i][j].equals(actualBoxs[i + 1][j])) {
-                                    actualBoxs[i][j].updateBox();
-                                    ;
-                                    actualBoxs[i + 1][j].setVisible(false);
-                                    ;
-                                    actualBoxs[i + 1][j] = null;
+                        if (actualBoxs[j][i] != null) {
+                            if (actualBoxs[j][i + 1] != null) {
+                                if (actualBoxs[j][i].equals(actualBoxs[j][i + 1])) {
+                                    actualBoxs[j][i].updateBox();
+                                    actualBoxs[j][i + 1].setVisible(false);
+                                    actualBoxs[j][i + 1] = null;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case DERECHA:
+                for (int i = actualBoxs.length - 1; i > 0; i--) {
+                    for (int j = actualBoxs[i].length - 1; j >= 0; j--) {
+                        if (actualBoxs[j][i] != null) {
+                            if (actualBoxs[j][i - 1] != null) {
+                                if (actualBoxs[j][i].equals(actualBoxs[j][i - 1])) {
+                                    actualBoxs[j][i].updateBox();
+                                    actualBoxs[j][i - 1].setVisible(false);
+                                    actualBoxs[j][i - 1] = null;
                                 }
                             }
                         }
@@ -158,11 +204,65 @@ public class MapGame extends JPanel {
                 }
                 break;
         }
-
-        repaint();
+        recollector(direction);
+        try {
+            Thread.sleep(25);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
-    public void moveBox(int oldRow, int oldCol, int newRow, int newCol) {
+    public void recollector(Direction direction) {
+        switch (direction) {
+            case ARRIBA:
+                for (int i = 1; i < actualBoxs.length; i++) {
+                    for (int j = 0; j < actualBoxs.length; j++) {
+                        if (actualBoxs[i][j] != null) {
+                            if (actualBoxs[i - 1][j] == null) {
+                                moveBox(i, j, i - 1, j, direction);
+                            }
+                        }
+                    }
+                }
+                break;
+            case ABAJO:
+                for (int i = actualBoxs.length - 2; i > 0; i--) {
+                    for (int j = actualBoxs[i].length - 1; j >= 0; j--) {
+                        if (actualBoxs[i][j] != null) {
+                            if (actualBoxs[i + 1][j] == null) {
+                                moveBox(i, j, i + 1, j, direction);
+                            }
+                        }
+                    }
+                }
+                break;
+            case IZQUIERDA:
+                for (int i = 1; i < actualBoxs.length; i++) {
+                    for (int j = 0; j < actualBoxs.length; j++) {
+                        if (actualBoxs[j][i] != null) {
+                            if (actualBoxs[j][i - 1] == null) {
+                                moveBox(j, i, j, i - 1, direction);
+                            }
+                        }
+                    }
+                }
+                break;
+            case DERECHA:
+                for (int i = actualBoxs.length - 2; i > 0; i--) {
+                    for (int j = actualBoxs[i].length - 1; j >= 0; j--) {
+                        if (actualBoxs[j][i] != null) {
+                            if (actualBoxs[j][i + 1] == null) {
+                                moveBox(j, i, j, i + 1, direction);
+                            }
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    public void moveBox(int oldRow, int oldCol, int newRow, int newCol, Direction direction) {
         Box[][] newMap = new Box[4][4];
 
         for (int i = 0; i < actualBoxs.length; i++) {
@@ -174,7 +274,7 @@ public class MapGame extends JPanel {
         }
 
         newMap[newRow][newCol] = actualBoxs[oldRow][oldCol];
-        newMap[newRow][newCol].setLocation(spawnPoints[newRow][newCol]);
+        newMap[newRow][newCol].moveAnimation(spawnPoints[oldRow][oldCol], spawnPoints[newRow][newCol], direction);
 
         actualBoxs = newMap;
     }
@@ -271,13 +371,6 @@ public class MapGame extends JPanel {
                 moveRight();
             }
         }
-    }
-
-    private enum Direction {
-        ARRIBA,
-        ABAJO,
-        DERECHA,
-        IZQUIERDA;
     }
 
     Point[][] spawnPoints;
